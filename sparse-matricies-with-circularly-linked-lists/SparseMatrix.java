@@ -1,4 +1,7 @@
 
+import java.io.PrintWriter;
+
+
 // class for the sparse matrix
 class SparseMatrix {
     int n; // size of matrix
@@ -211,10 +214,8 @@ class SparseMatrix {
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
                 int sum = m1.getValue(i, j) + m2.getValue(i, j);
-                if (sum != 0 ) {
-                    output.insert(i, j, sum);
-                } 
-
+                // dont need to check for 0's bc insert function checks if its a 0 before inserting
+                output.insert(i, j, sum);
             }
         }
 
@@ -228,12 +229,29 @@ class SparseMatrix {
         
         // brute force w/ 3(!!) nested loops (super unoptimal sorry)
         for (int i = 1; i <= n; i++) {
-            for (int j = 1; i <=1; i++) {
-                
+            for (int j = 1; j <= n; j++) {
+                // finding value of the i,j node in the new matrix
+                int product = 0;
+                for (int x = 1; x <= n; x++) {
+                    // add up the dot product of the row of m1 and the col of m2
+                    product += m1.getValue(i, x) * m2.getValue(x, j);
+                }
+                // dont need to check for 0's bc insert function checks if its a 0 before inserting
+                output.insert(i, j, product);
             }
         }
 
         return output;
+    }
+
+    public void writeToCSV(PrintWriter out) {
+        for (int i = 1; i <= n; i++) {
+            Node cur = rowHeaders[i].nextRowNode;
+            while (cur != rowHeaders[i]) {
+                out.println(cur.row + "," + cur.col + "," + cur.value);
+                cur = cur.nextRowNode;
+            }
+        }
     }
     
 
@@ -251,7 +269,7 @@ class SparseMatrix {
         output.insert(5, 1, 40);
         output.insert(4, 5, 50);
         output.printMatrixGrid();
-        SparseMatrix output2 = output.add(s, output);
+        SparseMatrix output2 = output.multiplication(s, output);
         output2.printMatrixGrid();
     }
 
